@@ -1,0 +1,9 @@
+touch src/uploads/profiles/.gitkeep
+touch src/uploads/cattle/.gitkeep
+touch src/uploads/temp/.gitkeep
+touch src/uploads/cattle/muzzle/.gitkeep
+touch src/uploads/cattle/face/.gitkeep
+touch src/uploads/cattle/left/.gitkeep
+touch src/uploads/cattle/right/.gitkeep
+touch src/uploads/cattle/fullBodyLeft/.gitkeep
+touch src/uploads/cattle/fullBodyRight/.gitkeep
