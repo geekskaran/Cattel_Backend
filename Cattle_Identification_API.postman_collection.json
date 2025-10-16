@@ -1,0 +1,2021 @@
+{
+  "info": {
+    "name": "Cattle Identification System API",
+    "description": "Complete API collection for Cattle Identification System with User, Regional Admin, M_Admin, and Super Admin workflows",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "regionalAdminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mAdminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "superAdminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cattleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "transferRequestId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health Check",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/../health",
+              "host": ["{{baseUrl}}"],
+              "path": ["..", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Root Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": [""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication - User/Farmer",
+      "item": [
+        {
+          "name": "User Signup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('userToken', jsonData.data.tokens.accessToken);",
+                  "    pm.environment.set('userId', jsonData.data.user.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Rajesh\",\n  \"lastName\": \"Kumar\",\n  \"email\": \"rajesh.kumar@example.com\",\n  \"mobileNumber\": \"9876543210\",\n  \"password\": \"RajeshKumar@123\",\n  \"confirmPassword\": \"RajeshKumar@123\",\n  \"dateOfBirth\": \"1985-05-15\",\n  \"occupation\": \"Farmer\",\n  \"address\": {\n    \"houseAndStreet\": \"123 Main Street\",\n    \"district\": \"Varanasi\",\n    \"state\": \"Uttar Pradesh\",\n    \"country\": \"India\",\n    \"pinCode\": \"221001\"\n  },\n  \"location\": {\n    \"coordinates\": [82.9739, 25.3176]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "signup"]
+            },
+            "description": "Register a new farmer/user account"
+          },
+          "response": []
+        },
+        {
+          "name": "User Login (Mobile + Password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('userToken', jsonData.data.tokens.accessToken);",
+                  "    pm.environment.set('userId', jsonData.data.user.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543210\",\n  \"password\": \"RajeshKumar@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Standard login with mobile number and password"
+          },
+          "response": []
+        },
+        {
+          "name": "Request OTP for Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/otp/request",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login", "otp", "request"]
+            },
+            "description": "Request OTP for OTP-based login"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify OTP and Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('userToken', jsonData.data.tokens.accessToken);",
+                  "    pm.environment.set('userId', jsonData.data.user.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543210\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/otp/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login", "otp", "verify"]
+            },
+            "description": "Verify OTP and complete login"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Mobile Number",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543210\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify/mobile",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "verify", "mobile"]
+            },
+            "description": "Verify mobile number after signup"
+          },
+          "response": []
+        },
+        {
+          "name": "Resend OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/resend-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "resend-otp"]
+            },
+            "description": "Resend OTP to mobile"
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "forgot-password"]
+            },
+            "description": "Request OTP for password reset"
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543210\",\n  \"otp\": \"123456\",\n  \"password\": \"NewPassword@123\",\n  \"confirmPassword\": \"NewPassword@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "reset-password"]
+            },
+            "description": "Reset password with OTP"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get currently logged in user details"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout user"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Authentication - Admin",
+      "item": [
+        {
+          "name": "Admin Login (Email + Password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    var role = jsonData.data.admin.role;",
+                  "    if (role === 'regional_admin') {",
+                  "        pm.environment.set('regionalAdminToken', jsonData.data.tokens.accessToken);",
+                  "    } else if (role === 'm_admin') {",
+                  "        pm.environment.set('mAdminToken', jsonData.data.tokens.accessToken);",
+                  "    } else if (role === 'super_admin') {",
+                  "        pm.environment.set('superAdminToken', jsonData.data.tokens.accessToken);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/admin/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "admin", "login"]
+            },
+            "description": "Admin login (Regional/M_Admin/Super Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Request Admin Login OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/admin/login/otp/request",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "admin", "login", "otp", "request"]
+            },
+            "description": "Request OTP for admin login"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Admin OTP and Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    var role = jsonData.data.admin.role;",
+                  "    if (role === 'regional_admin') {",
+                  "        pm.environment.set('regionalAdminToken', jsonData.data.tokens.accessToken);",
+                  "    } else if (role === 'm_admin') {",
+                  "        pm.environment.set('mAdminToken', jsonData.data.tokens.accessToken);",
+                  "    } else if (role === 'super_admin') {",
+                  "        pm.environment.set('superAdminToken', jsonData.data.tokens.accessToken);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/admin/login/otp/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "admin", "login", "otp", "verify"]
+            },
+            "description": "Verify OTP and admin login"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. User Profile & Settings",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "profile"]
+            },
+            "description": "Get logged in user's profile"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Rajesh\",\n  \"lastName\": \"Kumar\",\n  \"occupation\": \"Dairy Farmer\",\n  \"address\": {\n    \"houseAndStreet\": \"456 New Street\",\n    \"district\": \"Varanasi\",\n    \"state\": \"Uttar Pradesh\",\n    \"country\": \"India\",\n    \"pinCode\": \"221001\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "profile"]
+            },
+            "description": "Update user profile information"
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"RajeshKumar@123\",\n  \"newPassword\": \"NewPassword@456\",\n  \"confirmPassword\": \"NewPassword@456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "change-password"]
+            },
+            "description": "Change user password"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Email",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newemail@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/email",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "email"]
+            },
+            "description": "Update user email (requires verification)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Mobile Number",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543211\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/mobile",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "mobile"]
+            },
+            "description": "Update mobile number (requires verification)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "statistics"]
+            },
+            "description": "Get user's cattle and transfer statistics"
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Account",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "deactivate"]
+            },
+            "description": "Deactivate user account"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Cattle Registration & Management",
+      "item": [
+        {
+          "name": "Register Cattle (with 14 images)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('cattleId', jsonData.data.cattle.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "breed",
+                  "value": "Holstein Friesian",
+                  "type": "text"
+                },
+                {
+                  "key": "tagNo",
+                  "value": "TAG001",
+                  "type": "text"
+                },
+                {
+                  "key": "medicalHistory",
+                  "value": "Vaccinated, No major illnesses",
+                  "type": "text"
+                },
+                {
+                  "key": "age",
+                  "value": "3",
+                  "type": "text"
+                },
+                {
+                  "key": "type",
+                  "value": "Dairy",
+                  "type": "text"
+                },
+                {
+                  "key": "color",
+                  "value": "Black and White",
+                  "type": "text"
+                },
+                {
+                  "key": "muzzle",
+                  "type": "file",
+                  "src": "/path/to/muzzle1.jpg"
+                },
+                {
+                  "key": "muzzle",
+                  "type": "file",
+                  "src": "/path/to/muzzle2.jpg"
+                },
+                {
+                  "key": "muzzle",
+                  "type": "file",
+                  "src": "/path/to/muzzle3.jpg"
+                },
+                {
+                  "key": "face",
+                  "type": "file",
+                  "src": "/path/to/face1.jpg"
+                },
+                {
+                  "key": "face",
+                  "type": "file",
+                  "src": "/path/to/face2.jpg"
+                },
+                {
+                  "key": "face",
+                  "type": "file",
+                  "src": "/path/to/face3.jpg"
+                },
+                {
+                  "key": "left",
+                  "type": "file",
+                  "src": "/path/to/left1.jpg"
+                },
+                {
+                  "key": "left",
+                  "type": "file",
+                  "src": "/path/to/left2.jpg"
+                },
+                {
+                  "key": "left",
+                  "type": "file",
+                  "src": "/path/to/left3.jpg"
+                },
+                {
+                  "key": "right",
+                  "type": "file",
+                  "src": "/path/to/right1.jpg"
+                },
+                {
+                  "key": "right",
+                  "type": "file",
+                  "src": "/path/to/right2.jpg"
+                },
+                {
+                  "key": "right",
+                  "type": "file",
+                  "src": "/path/to/right3.jpg"
+                },
+                {
+                  "key": "fullBodyLeft",
+                  "type": "file",
+                  "src": "/path/to/fullBodyLeft.jpg"
+                },
+                {
+                  "key": "fullBodyRight",
+                  "type": "file",
+                  "src": "/path/to/fullBodyRight.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cattle/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle", "register"]
+            },
+            "description": "Register new cattle with 14 images (3 muzzle, 3 face, 3 left, 3 right, 1 full body left, 1 full body right)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User's Cattle Gallery",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/cattle?status=active&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "cattle"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status: active, archive, transit"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "search",
+                  "value": "Holstein",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get user's cattle with filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Cattle Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/cattle/{{cattleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "cattle", "{{cattleId}}"]
+            },
+            "description": "Get detailed information about a specific cattle"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Cattle (Any User/Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cattle?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "breed",
+                  "value": "Holstein",
+                  "disabled": true
+                },
+                {
+                  "key": "state",
+                  "value": "Uttar Pradesh",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all cattle (filtered by role)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cattle by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cattle/{{cattleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle", "{{cattleId}}"]
+            },
+            "description": "Get cattle details by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cattle Images by Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cattle/{{cattleId}}/images/muzzle",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle", "{{cattleId}}", "images", "muzzle"]
+            },
+            "description": "Get cattle images by category (muzzle, face, left, right, fullBodyLeft, fullBodyRight)"
+          },
+          "response": []
+        },
+        {
+          "name": "Archive Cattle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cattle/{{cattleId}}/archive",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle", "{{cattleId}}", "archive"]
+            },
+            "description": "Move cattle to archive (recycle bin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Restore Cattle from Archive",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cattle/{{cattleId}}/restore",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle", "{{cattleId}}", "restore"]
+            },
+            "description": "Restore cattle from archive"
+          },
+          "response": []
+          },
+        {
+          "name": "Delete Cattle Permanently",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cattle/{{cattleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle", "{{cattleId}}"]
+            },
+            "description": "Permanently delete cattle"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cattle Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cattle/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle", "statistics"]
+            },
+            "description": "Get cattle statistics"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Cattle Transfer (Sell)",
+      "item": [
+        {
+          "name": "Initiate Cattle Transfer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('transferRequestId', jsonData.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toOwnerId\": \"USER_ID_OF_NEW_OWNER\",\n  \"transferType\": \"sell\",\n  \"price\": 50000,\n  \"notes\": \"Healthy cattle, well maintained\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cattle/{{cattleId}}/transfer",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle", "{{cattleId}}", "transfer"]
+            },
+            "description": "Initiate cattle transfer (sell)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transfer Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/transfer-requests?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "transfer-requests"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "pending, accepted, rejected, cancelled"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get user's transfer requests (sent and received)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transfer Request Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/transfer-requests/{{transferRequestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "transfer-requests", "{{transferRequestId}}"]
+            },
+            "description": "Get details of a transfer request"
+          },
+          "response": []
+        },
+        {
+          "name": "Accept Transfer Request",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/transfer-requests/{{transferRequestId}}/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "transfer-requests", "{{transferRequestId}}", "accept"]
+            },
+            "description": "Accept transfer request (by receiver)"
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Transfer Request",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Not interested at this price\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/transfer-requests/{{transferRequestId}}/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "transfer-requests", "{{transferRequestId}}", "reject"]
+            },
+            "description": "Reject transfer request (by receiver)"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Transfer Request",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Changed my mind\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/transfer-requests/{{transferRequestId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "transfer-requests", "{{transferRequestId}}", "cancel"]
+            },
+            "description": "Cancel transfer request (by sender)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cattle Transfer History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cattle/{{cattleId}}/transfer-history",
+              "host": ["{{baseUrl}}"],
+              "path": ["cattle", "{{cattleId}}", "transfer-history"]
+            },
+            "description": "Get cattle's transfer history"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Admin - Super Admin Only",
+      "item": [
+        {
+          "name": "Create Regional Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Amit\",\n  \"lastName\": \"Sharma\",\n  \"email\": \"amit.sharma@admin.com\",\n  \"mobileNumber\": \"9876543200\",\n  \"password\": \"AmitAdmin@123\",\n  \"assignedRegion\": {\n    \"state\": \"Uttar Pradesh\",\n    \"districts\": [\"Varanasi\", \"Lucknow\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/regional-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "regional-admin"]
+            },
+            "description": "Create regional admin (Super Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Create M_Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Priya\",\n  \"lastName\": \"Patel\",\n  \"email\": \"priya.patel@madmin.com\",\n  \"mobileNumber\": \"9876543201\",\n  \"password\": \"PriyaAdmin@123\",\n  \"assignedRegion\": {\n    \"state\": \"Uttar Pradesh\",\n    \"districts\": [\"Varanasi\", \"Lucknow\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/m-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "m-admin"]
+            },
+            "description": "Create M_Admin for identification (Super Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Admins",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/admins?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "admins"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "role",
+                  "value": "regional_admin",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all admins (Super Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Admin",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/ADMIN_ID/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "ADMIN_ID", "approve"]
+            },
+            "description": "Approve admin account (Super Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Admin",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/ADMIN_ID/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "ADMIN_ID", "deactivate"]
+            },
+            "description": "Deactivate admin account (Super Admin only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Admin - Regional Admin Workflow",
+      "item": [
+        {
+          "name": "Get Pending Cattle for Review",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/regional/cattle/pending?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "regional", "cattle", "pending"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "overdue",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get cattle pending regional admin review"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cattle for Regional Review",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/regional/cattle/{{cattleId}}/review",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "regional", "cattle", "{{cattleId}}", "review"]
+            },
+            "description": "Get cattle details for regional review"
+          },
+          "response": []
+        },
+        {
+          "name": "Forward Cattle to M_Admin",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/regional/cattle/{{cattleId}}/forward",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "regional", "cattle", "{{cattleId}}", "forward"]
+            },
+            "description": "Forward cattle to M_Admin for identification"
+          },
+          "response": []
+        },
+        {
+          "name": "Deny Cattle by Regional Admin",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Images are blurry and unclear. Please resubmit with clear images.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/regional/cattle/{{cattleId}}/deny",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "regional", "cattle", "{{cattleId}}", "deny"]
+            },
+            "description": "Deny cattle registration (Regional Admin)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. Admin - M_Admin Workflow",
+      "item": [
+        {
+          "name": "Get Pending Cattle for Identification",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/m-admin/cattle/pending?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "m-admin", "cattle", "pending"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Get cattle pending M_Admin identification"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cattle for M_Admin Verification",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/m-admin/cattle/{{cattleId}}/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "m-admin", "cattle", "{{cattleId}}", "verify"]
+            },
+            "description": "Get cattle details for M_Admin verification"
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Cattle by M_Admin",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/m-admin/cattle/{{cattleId}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "m-admin", "cattle", "{{cattleId}}", "approve"]
+            },
+            "description": "Approve cattle after identification (Final Approval)"
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Cattle by M_Admin",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{mAdminToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Could not identify unique features. Cattle may already be registered.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/m-admin/cattle/{{cattleId}}/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "m-admin", "cattle", "{{cattleId}}", "reject"]
+            },
+            "description": "Reject cattle after identification (Final Rejection)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10. Admin - User & Cattle Management",
+      "item": [
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "state",
+                  "value": "Uttar Pradesh",
+                  "disabled": true
+                },
+                {
+                  "key": "district",
+                  "value": "Varanasi",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "Rajesh",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all users (Regional admin: only their region)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{userId}}"]
+            },
+            "description": "Get user details by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Search User by Phone",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/search/phone/9876543210",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "search", "phone", "9876543210"]
+            },
+            "description": "Search user by phone number"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Cattle (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/cattle?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "cattle"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "verificationStatus",
+                  "value": "approved",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all cattle (admin view)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cattle by ID (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/cattle/{{cattleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "cattle", "{{cattleId}}"]
+            },
+            "description": "Get cattle by ID (admin view)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11. Admin - Dashboard & Notifications",
+      "item": [
+        {
+          "name": "Get Admin Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard"]
+            },
+            "description": "Get admin dashboard with statistics"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Admin Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/notifications?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "notifications"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "isRead",
+                  "value": "false",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get admin notifications"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/notifications/NOTIFICATION_ID/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "notifications", "NOTIFICATION_ID", "read"]
+            },
+            "description": "Mark notification as read"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All Notifications as Read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "notifications", "read-all"]
+            },
+            "description": "Mark all notifications as read"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12. Reports",
+      "item": [
+        {
+          "name": "Generate Farmers Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/farmers?format=xlsx",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "farmers"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "xlsx",
+                  "description": "xlsx or csv"
+                },
+                {
+                  "key": "state",
+                  "value": "Uttar Pradesh",
+                  "disabled": true
+                },
+                {
+                  "key": "district",
+                  "value": "Varanasi",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Generate farmers report (Excel/CSV)"
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Cattle Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/cattle?format=xlsx",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "cattle"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "xlsx",
+                  "description": "xlsx or csv"
+                },
+                {
+                  "key": "state",
+                  "value": "Uttar Pradesh",
+                  "disabled": true
+                },
+                {
+                  "key": "verificationStatus",
+                  "value": "approved",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Generate cattle report (Excel/CSV)"
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Combined Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/combined",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "combined"],
+              "query": [
+                {
+                  "key": "state",
+                  "value": "Uttar Pradesh",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Generate combined report (Farmers + Cattle)"
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Verification Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/verification?format=xlsx",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "verification"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "xlsx"
+                },
+                {
+                  "key": "status",
+                  "value": "approved",
+                  "disabled": true
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-01-01",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-12-31",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Generate verification report with turnaround tracking"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Report Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{regionalAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "statistics"]
+            },
+            "description": "Get report statistics (JSON response, no file)"
+          },
+          "response": []
+        },
+        {
+          "name": "Cleanup Old Reports",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/cleanup?daysOld=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "cleanup"],
+              "query": [
+                {
+                  "key": "daysOld",
+                  "value": "7"
+                }
+              ]
+            },
+            "description": "Cleanup old report files (Super Admin only)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

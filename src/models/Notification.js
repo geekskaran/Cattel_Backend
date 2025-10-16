@@ -19,13 +19,13 @@ const notificationSchema = new mongoose.Schema({
   },
 
   // Notification type
-type: {
+  type: {
     type: String,
     required: true,
     enum: [
       'cattle_registered',              // New cattle submitted
-      'cattle_forwarded_to_m_admin',   // NEW: Regional admin forwarded to M_Admin
-      'cattle_denied_by_regional',     // NEW: Regional admin denied
+      'cattle_forwarded_to_m_admin',   // Regional admin forwarded to M_Admin
+      'cattle_denied_by_regional',     // Regional admin denied
       'cattle_approved',                // M_Admin approved
       'cattle_rejected',                // M_Admin rejected
       'verification_reminder',          // Reminder for pending verification
@@ -95,9 +95,9 @@ type: {
     trim: true
   },
 
-  // Metadata for additional information
+  // Metadata for additional information - FIXED
   metadata: {
-    type: mongoose.Schema.Mixed,
+    type: mongoose.Schema.Types.Mixed,
     default: {}
   },
 
