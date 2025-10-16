@@ -116,25 +116,24 @@ const registerCattle = asyncHandler(async (req, res) => {
   // Create notification for regional admin
   const Admin = require('../models/Admin');
   const regionalAdmins = await Admin.find({
-    role: 'regional_admin',
+    role: 'regional_admin', // Only regional admins get initial notification
     'assignedRegion.state': user.address.state,
     isActive: true,
     isApproved: true
   });
-
-  // Notify all regional admins in this region
+ // Notify regional admins in this region
   for (const admin of regionalAdmins) {
     await Notification.create({
       recipient: admin._id,
       recipientModel: 'Admin',
       type: 'cattle_registered',
       title: 'New Cattle Registration',
-      message: `New cattle (${cattle.cattleId}) registered by ${user.fullName} in ${user.address.district}, ${user.address.state}. Please verify within 48 hours.`,
+      message: `New cattle (${cattle.cattleId}) registered by ${user.fullName} in ${user.address.district}, ${user.address.state}. Please review within 48 hours.`,
       relatedCattle: cattle._id,
       relatedUser: user._id,
       priority: 'high',
-      actionUrl: `/admin/cattle/${cattle._id}/verify`,
-      actionText: 'Verify Now'
+      actionUrl: `/admin/regional/cattle/${cattle._id}/review`,
+      actionText: 'Review Now'
     });
 
     // Update admin statistics

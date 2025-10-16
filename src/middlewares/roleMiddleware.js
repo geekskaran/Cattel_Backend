@@ -277,12 +277,58 @@ const checkOwnership = (resourceType) => {
   };
 };
 
+
+/**
+ * M_Admin only access (NEW)
+ */
+const mAdminOnly = (req, res, next) => {
+  if (req.userType !== 'admin' || req.user.role !== 'm_admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'This resource is only accessible to M_Admins'
+    });
+  }
+
+  // Check if M_Admin is approved
+  if (!req.user.isApproved) {
+    return res.status(403).json({
+      success: false,
+      message: 'Your M_Admin account is pending approval'
+    });
+  }
+
+  next();
+};
+
+/**
+ * Regional Admin or M_Admin access (NEW)
+ */
+const regionalOrMAdminOnly = (req, res, next) => {
+  if (req.userType !== 'admin' || 
+      (req.user.role !== 'regional_admin' && req.user.role !== 'm_admin')) {
+    return res.status(403).json({
+      success: false,
+      message: 'This resource is only accessible to Regional Admins or M_Admins'
+    });
+  }
+
+  if (!req.user.isApproved) {
+    return res.status(403).json({
+      success: false,
+      message: 'Your admin account is pending approval'
+    });
+  }
+
+  next();
+};
 module.exports = {
   authorize,
   userOnly,
   adminOnly,
   regionalAdminOnly,
   superAdminOnly,
+  mAdminOnly, // NEW
+  regionalOrMAdminOnly, // NEW
   checkRegionalAccess,
   canManageUser,
   canManageCattle,

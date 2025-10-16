@@ -19,23 +19,25 @@ const notificationSchema = new mongoose.Schema({
   },
 
   // Notification type
-  type: {
+type: {
     type: String,
     required: true,
     enum: [
-      'cattle_registered',           // New cattle submitted for verification
-      'cattle_approved',             // Cattle approved by admin
-      'cattle_rejected',             // Cattle rejected by admin
-      'verification_reminder',       // Reminder for pending verification (approaching 48hr deadline)
-      'verification_overdue',        // Verification deadline exceeded
-      'transfer_request_received',   // New transfer request received
-      'transfer_request_accepted',   // Transfer request accepted
-      'transfer_request_rejected',   // Transfer request rejected
-      'transfer_request_cancelled',  // Transfer request cancelled
-      'admin_approved',              // Regional admin account approved
-      'admin_rejected',              // Regional admin account rejected
-      'account_activated',           // Account activated
-      'account_deactivated'          // Account deactivated
+      'cattle_registered',              // New cattle submitted
+      'cattle_forwarded_to_m_admin',   // NEW: Regional admin forwarded to M_Admin
+      'cattle_denied_by_regional',     // NEW: Regional admin denied
+      'cattle_approved',                // M_Admin approved
+      'cattle_rejected',                // M_Admin rejected
+      'verification_reminder',          // Reminder for pending verification
+      'verification_overdue',           // Verification deadline exceeded
+      'transfer_request_received',      // Transfer request received
+      'transfer_request_accepted',      // Transfer accepted
+      'transfer_request_rejected',      // Transfer rejected
+      'transfer_request_cancelled',     // Transfer cancelled
+      'admin_approved',                 // Admin account approved
+      'admin_rejected',                 // Admin account rejected
+      'account_activated',              // Account activated
+      'account_deactivated'             // Account deactivated
     ]
   },
 

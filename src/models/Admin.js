@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 /**
- * Admin Schema - Represents Regional Admins and Super Admins
- * Handles admin authentication, regional management, and verification tasks
+ * Admin Schema - Represents Regional Admins, M_Admins, and Super Admins
+ * Updated workflow:
+ * - Regional Admin: Reviews and forwards/denies cattle to M_Admin
+ * - M_Admin: Performs identification and approves/rejects cattle
+ * - Super Admin: Global management
  */
 const adminSchema = new mongoose.Schema({
   // Personal Information
@@ -39,14 +42,14 @@ const adminSchema = new mongoose.Schema({
     select: false
   },
 
-  // Admin Role
+  // Admin Role - UPDATED with m_admin
   role: {
     type: String,
-    enum: ['regional_admin', 'super_admin'],
+    enum: ['regional_admin', 'm_admin', 'super_admin'],
     required: [true, 'Admin role is required']
   },
 
-  // Regional Assignment (only for regional_admin)
+  // Regional Assignment (for regional_admin and m_admin)
   assignedRegion: {
     state: {
       type: String,
@@ -78,7 +81,7 @@ const adminSchema = new mongoose.Schema({
   // Account Status
   isActive: {
     type: Boolean,
-    default: false // Regional admins need super admin approval
+    default: false // All admins need super admin approval
   },
   isApproved: {
     type: Boolean,
@@ -112,7 +115,7 @@ const adminSchema = new mongoose.Schema({
     userAgent: String
   }],
 
-  // Statistics for Regional Admin
+  // Statistics for Regional Admin and M_Admin
   statistics: {
     totalVerifications: {
       type: Number,
@@ -122,11 +125,19 @@ const adminSchema = new mongoose.Schema({
       type: Number,
       default: 0
     },
+    forwardedToMAdmin: { // NEW: For Regional Admin
+      type: Number,
+      default: 0
+    },
     approvedCattle: {
       type: Number,
       default: 0
     },
     rejectedCattle: {
+      type: Number,
+      default: 0
+    },
+    deniedByRegionalAdmin: { // NEW: For tracking regional admin denials
       type: Number,
       default: 0
     }
@@ -138,7 +149,7 @@ const adminSchema = new mongoose.Schema({
     ref: 'Notification'
   }],
 
-  // Created by (for regional admins created by super admin or backend team)
+  // Created by (for admins created by super admin or backend team)
   createdBy: {
     type: String,
     enum: ['backend_team', 'super_admin'],
@@ -155,10 +166,11 @@ adminSchema.index({ mobileNumber: 1 });
 adminSchema.index({ role: 1 });
 adminSchema.index({ 'assignedRegion.state': 1 });
 
-// Validation: Regional admin must have assigned region
+// Validation: Regional admin and M_admin must have assigned region
 adminSchema.pre('save', function(next) {
-  if (this.role === 'regional_admin' && (!this.assignedRegion || !this.assignedRegion.state)) {
-    return next(new Error('Regional admin must have an assigned region'));
+  if ((this.role === 'regional_admin' || this.role === 'm_admin') && 
+      (!this.assignedRegion || !this.assignedRegion.state)) {
+    return next(new Error(`${this.role} must have an assigned region`));
   }
   next();
 });
@@ -231,7 +243,7 @@ adminSchema.methods.canManageRegion = function(state, district = null) {
     return true;
   }
 
-  if (this.role === 'regional_admin') {
+  if (this.role === 'regional_admin' || this.role === 'm_admin') {
     if (this.assignedRegion.state !== state) {
       return false;
     }
