@@ -1,7 +1,7 @@
 require('dotenv').config();
-const app = require('./app');
-const connectDatabase = require('./config/database');
-const { verifyEmailConfig } = require('./config/email');
+const app = require('./src/app');
+const connectDatabase = require('./src/config/database');
+const { verifyEmailConfig } = require('./src/config/email');
 
 /**
  * Server Initialization
