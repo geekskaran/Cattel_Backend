@@ -31,6 +31,8 @@ const {
 
 router.use(protect);
 
+// ✅ ADD THIS LINE - Get user's cattle
+router.get('/my', userOnly, getAllCattle);
 /**
  * @route   POST /api/v1/cattle/register
  * @desc    Register new cattle with 14 images

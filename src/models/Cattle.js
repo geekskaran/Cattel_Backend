@@ -11,8 +11,8 @@ const cattleSchema = new mongoose.Schema({
   // System Generated Unique Cattle ID
   cattleId: {
     type: String,
-    unique: true,
-    required: true
+    // unique: true,
+    // required: true
   },
 
   // Owner Information
