@@ -119,7 +119,9 @@ const adminSchema = new mongoose.Schema({
   statistics: {
     totalVerifications: {
       type: Number,
-      default: 0
+      default: 0,
+      identificationRequestsPending: { type: Number, default: 0 },     // NEW
+      identificationRequestsCompleted: { type: Number, default: 0 }
     },
     pendingVerifications: {
       type: Number,
@@ -167,16 +169,16 @@ adminSchema.index({ role: 1 });
 adminSchema.index({ 'assignedRegion.state': 1 });
 
 // Validation: Regional admin and M_admin must have assigned region
-adminSchema.pre('save', function(next) {
-  if ((this.role === 'regional_admin' || this.role === 'm_admin') && 
-      (!this.assignedRegion || !this.assignedRegion.state)) {
+adminSchema.pre('save', function (next) {
+  if ((this.role === 'regional_admin' || this.role === 'm_admin') &&
+    (!this.assignedRegion || !this.assignedRegion.state)) {
     return next(new Error(`${this.role} must have an assigned region`));
   }
   next();
 });
 
 // Hash password before saving
-adminSchema.pre('save', async function(next) {
+adminSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
@@ -191,26 +193,26 @@ adminSchema.pre('save', async function(next) {
 });
 
 // Method to compare password
-adminSchema.methods.comparePassword = async function(candidatePassword) {
+adminSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Method to generate OTP
-adminSchema.methods.generateOTP = function() {
+adminSchema.methods.generateOTP = function () {
   const otpLength = parseInt(process.env.OTP_LENGTH) || 6;
   const otp = Math.floor(Math.pow(10, otpLength - 1) + Math.random() * 9 * Math.pow(10, otpLength - 1)).toString();
-  
+
   this.otp = {
     code: otp,
     expiresAt: new Date(Date.now() + parseInt(process.env.OTP_EXPIRE_MINUTES) * 60 * 1000),
     attempts: 0
   };
-  
+
   return otp;
 };
 
 // Method to verify OTP
-adminSchema.methods.verifyOTP = function(candidateOTP) {
+adminSchema.methods.verifyOTP = function (candidateOTP) {
   if (!this.otp || !this.otp.code) {
     return { success: false, message: 'No OTP found' };
   }
@@ -233,12 +235,12 @@ adminSchema.methods.verifyOTP = function(candidateOTP) {
 };
 
 // Virtual for full name
-adminSchema.virtual('fullName').get(function() {
+adminSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
 // Check if admin can manage a specific region
-adminSchema.methods.canManageRegion = function(state, district = null) {
+adminSchema.methods.canManageRegion = function (state, district = null) {
   if (this.role === 'super_admin') {
     return true;
   }
@@ -247,11 +249,11 @@ adminSchema.methods.canManageRegion = function(state, district = null) {
     if (this.assignedRegion.state !== state) {
       return false;
     }
-    
+
     if (district && this.assignedRegion.districts.length > 0) {
       return this.assignedRegion.districts.includes(district);
     }
-    
+
     return true;
   }
 

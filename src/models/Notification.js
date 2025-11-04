@@ -37,7 +37,12 @@ const notificationSchema = new mongoose.Schema({
       'admin_approved',                 // Admin account approved
       'admin_rejected',                 // Admin account rejected
       'account_activated',              // Account activated
-      'account_deactivated'             // Account deactivated
+      'account_deactivated',
+      'identification_request_created',      // NEW
+      'identification_processing_started',   // NEW
+      'identification_found',                // NEW
+      'identification_not_found',            // NEW
+      'identification_failed',               // NEW             // Account deactivated
     ]
   },
 
@@ -104,7 +109,7 @@ const notificationSchema = new mongoose.Schema({
   // Expiry (auto-delete old notifications)
   expiresAt: {
     type: Date,
-    default: function() {
+    default: function () {
       // Notifications expire after 90 days
       return new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
     }
@@ -121,7 +126,7 @@ notificationSchema.index({ createdAt: -1 });
 notificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL index for auto-deletion
 
 // Method to mark as read
-notificationSchema.methods.markAsRead = async function() {
+notificationSchema.methods.markAsRead = async function () {
   if (!this.isRead) {
     this.isRead = true;
     this.readAt = new Date();
@@ -131,13 +136,13 @@ notificationSchema.methods.markAsRead = async function() {
 };
 
 // Static method to create notification
-notificationSchema.statics.createNotification = async function(data) {
+notificationSchema.statics.createNotification = async function (data) {
   const notification = await this.create(data);
   return notification;
 };
 
 // Static method to get unread count for a user/admin
-notificationSchema.statics.getUnreadCount = async function(recipientId, recipientModel) {
+notificationSchema.statics.getUnreadCount = async function (recipientId, recipientModel) {
   return await this.countDocuments({
     recipient: recipientId,
     recipientModel: recipientModel,
@@ -146,7 +151,7 @@ notificationSchema.statics.getUnreadCount = async function(recipientId, recipien
 };
 
 // Static method to mark all as read for a user/admin
-notificationSchema.statics.markAllAsRead = async function(recipientId, recipientModel) {
+notificationSchema.statics.markAllAsRead = async function (recipientId, recipientModel) {
   const result = await this.updateMany(
     {
       recipient: recipientId,
@@ -164,14 +169,14 @@ notificationSchema.statics.markAllAsRead = async function(recipientId, recipient
 };
 
 // Static method to delete old read notifications
-notificationSchema.statics.cleanupOldNotifications = async function(daysOld = 30) {
+notificationSchema.statics.cleanupOldNotifications = async function (daysOld = 30) {
   const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
-  
+
   const result = await this.deleteMany({
     isRead: true,
     readAt: { $lt: cutoffDate }
   });
-  
+
   return result.deletedCount;
 };
 

@@ -338,6 +338,44 @@ const validatePhoneNumber = [
   handleValidationErrors
 ];
 
+
+
+// ADD THIS CODE TO YOUR EXISTING validationMiddleware.js
+
+const validateIdentificationRequest = [
+  body('latitude')
+    .optional()
+    .isFloat({ min: -90, max: 90 })
+    .withMessage('Invalid latitude'),
+  body('longitude')
+    .optional()
+    .isFloat({ min: -180, max: 180 })
+    .withMessage('Invalid longitude'),
+  body('address')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Address must be less than 500 characters'),
+  body('deviceInfo')
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('Device info must be less than 200 characters'),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+    next();
+  }
+];
+
+
 module.exports = {
   handleValidationErrors,
   validateUserSignup,
@@ -353,5 +391,6 @@ module.exports = {
   validateChangePassword,
   validateSearchQuery,
   validatePagination,
-  validatePhoneNumber
+  validatePhoneNumber,
+  validateIdentificationRequest
 };
